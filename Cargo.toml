@@ -6,6 +6,7 @@ license = "MIT"
 repository = "https://github.com/denosaurs/deno_json_op"
 version = "0.1.0"
 edition = "2018"
+exclude = ["example"]
 
 [lib]
 proc-macro = true
