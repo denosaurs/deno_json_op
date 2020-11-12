@@ -33,36 +33,43 @@ pub fn json_op(_args: TokenStream, item: TokenStream) -> TokenStream {
   };
 
   let body = if is_async {
-    quote! {
-      let fut = #impl_name(interface, val, &mut zero_copy[1..])
-        .then(|res| async {
-          let res = match res {
-            Ok(val) => ::deno_core::serde_json::json!({ "ok": val }),
-            Err(err) => ::deno_core::serde_json::json!({
-              "err": err.to_string()
-            }),
-          };
-          ::deno_core::serde_json::to_vec(&res).unwrap().into_boxed_slice()
-        });
-      ::deno_core::Op::Async(fut.boxed())
-    }
+    // TODO
+    // quote! {
+    //   let fut = #impl_name(val, rest)
+    //     .then(|res| async {
+    //       let res = match res {
+    //         Ok(val) => deno_core::serde_json::json!({ "ok": val }),
+    //         Err(err) => deno_core::serde_json::json!({
+    //           "err": err.to_string()
+    //         }),
+    //       };
+    //       deno_core::serde_json::to_vec(&res).unwrap().into_boxed_slice()
+    //     });
+    //   deno_core::Op::Async(fut.boxed())
+    // }
+
+    panic!("async functions are not supported yet");
   } else {
     quote! {
-      let res = match #impl_name(interface, val, &mut zero_copy[1..]) {
-        Ok(val) => ::deno_core::serde_json::json!({ "ok": val }),
-        Err(err) => ::deno_core::serde_json::json!({
+      let res = match #impl_name(val, rest) {
+        Ok(val) => deno_core::serde_json::json!({
+          "ok": val
+        }),
+        Err(err) => deno_core::serde_json::json!({
           "err": err.to_string()
         }),
       };
-      ::deno_core::Op::Sync(::deno_core::serde_json::to_vec(&res).unwrap().into_boxed_slice())
+
+      deno_core::Op::Sync(deno_core::serde_json::to_vec(&res).unwrap().into_boxed_slice())
     }
   };
 
   (quote! {
     #impl_func
 
-    fn #name (interface: &mut dyn ::deno_core::plugin_api::Interface, zero_copy: &mut [::deno_core::ZeroCopyBuf]) -> Op {
-      let val = ::deno_core::serde_json::from_slice(&zero_copy[0]).unwrap();
+    fn #name (_interface: &mut dyn deno_core::plugin_api::Interface, zero_copy: &mut [deno_core::ZeroCopyBuf]) -> Op {
+      let val = deno_core::serde_json::from_slice(&zero_copy[0]).unwrap();
+      let rest = &mut zero_copy[1..];
 
       #body
     }
