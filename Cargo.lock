@@ -2,7 +2,7 @@
 # It is not intended for manual editing.
 [[package]]
 name = "deno_json_op"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "quote",
  "syn",
