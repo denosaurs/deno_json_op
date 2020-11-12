@@ -1,0 +1,10 @@
+[package]
+name = "deno_json_op_example"
+version = "0.1.0"
+authors = ["Elias Sjögreen"]
+edition = "2018"
+publish = false
+
+[dependencies]
+deno_core = "0.67.0"
+deno_json_op = { path = "../" }
